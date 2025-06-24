@@ -1,0 +1,95 @@
+/* Exercise 1:  
+From the AdventureWorksDW2019 database, table DimEmployee,  
+retrieve the following columns: EmployeeKey, FirstName, LastName, BaseRate, VacationHours, SickLeaveHours.  
+
+Then create additional calculated columns:  
+a. FullName → FirstName + ' ' + LastName  
+b. VacationLeavePay → BaseRate * VacationHours  
+c. SickLeavePay → BaseRate * SickLeaveHours  
+d. TotalLeavePay → VacationLeavePay + SickLeavePay  
+*/
+
+SELECT 
+    EmployeeKey, 
+    FirstName, 
+    LastName, 
+    BaseRate, 
+    VacationHours, 
+    SickLeaveHours, 
+    FirstName + ' ' + LastName AS FullName, 
+    BaseRate * VacationHours AS VacationLeavePay, 
+    BaseRate * SickLeaveHours AS SickLeavePay, 
+    (BaseRate * VacationHours) + (BaseRate * SickLeaveHours) AS TotalLeavePay 
+FROM DimEmployee;
+
+--------------------------------------------------------------------------------
+
+/* Exercise 2:  
+From the AdventureWorksDW2019 database, table FactInternetSales,  
+retrieve: SalesOrderNumber, ProductKey, OrderDate.  
+
+Then calculate the following:  
+a. TotalRevenue → OrderQuantity * UnitPrice  
+b. TotalCost → ProductStandardCost + DiscountAmount  
+c. Profit → TotalRevenue - TotalCost  
+d. Profit Margin → (TotalRevenue - TotalCost) / TotalRevenue * 100  
+*/
+
+SELECT 
+    SalesOrderNumber, 
+    ProductKey, 
+    OrderDate, 
+    OrderQuantity * UnitPrice AS TotalRevenue, 
+    ProductStandardCost + DiscountAmount AS TotalCost, 
+    (OrderQuantity * UnitPrice) - (ProductStandardCost + DiscountAmount) AS Profit, 
+    ((OrderQuantity * UnitPrice) - (ProductStandardCost + DiscountAmount)) / (OrderQuantity * UnitPrice) * 100 AS ProfitMargin 
+FROM FactInternetSales;
+
+--------------------------------------------------------------------------------
+
+/* Exercise 3:  
+From the AdventureWorksDW2019 database, table FactProductInventory,  
+retrieve: MovementDate, ProductKey.  
+
+Also calculate:  
+a. NoProductEOD → UnitsBalance + UnitsIn - UnitsOut  
+b. TotalCost → NoProductEOD * UnitCost  
+*/
+
+SELECT 
+    MovementDate, 
+    ProductKey, 
+    UnitsBalance + UnitsIn - UnitsOut AS NoProductEOD, 
+    (UnitsBalance + UnitsIn - UnitsOut) * UnitCost AS TotalCost 
+FROM FactProductInventory;
+
+--------------------------------------------------------------------------------
+
+/* Exercise 4:  
+From the AdventureWorksDW2019 database, table DimGeography,  
+retrieve: EnglishCountryRegionName, City, StateProvinceName.  
+
+Remove duplicates and sort results by:  
+- EnglishCountryRegionName (ascending)  
+- City (descending) for countries with the same name  
+*/
+
+SELECT DISTINCT 
+    EnglishCountryRegionName, 
+    City, 
+    StateProvinceName 
+FROM DimGeography 
+ORDER BY 
+    EnglishCountryRegionName ASC, 
+    City DESC;
+
+--------------------------------------------------------------------------------
+
+/* Exercise 5:  
+From the AdventureWorksDW2019 database, table DimProduct,  
+retrieve EnglishProductName of the top 10% products with the highest ListPrice.  
+*/
+
+SELECT TOP 10 PERCENT EnglishProductName 
+FROM DimProduct 
+ORDER BY ListPrice DESC;
