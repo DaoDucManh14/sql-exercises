@@ -1,64 +1,84 @@
-/* Ex1: Dựa và bảng FactInternetSales, tính tổng số lượng sản phẩm (OrderQuantity) 
-đã được bán cho mỗi khách hàng (CustomerKey). Hiển thị kết quả theo thứ tự giảm dần của tổng số lượng.  
-*/ 
+/* Exercise 1:
+Based on the FactInternetSales table,  
+calculate the total number of products sold (OrderQuantity) for each customer (CustomerKey).  
+Display the results in descending order of total quantity.
+*/
+
 SELECT
     CustomerKey,
-    SUM(OrderQuantity) AS TOTALQUANTITY
+    SUM(OrderQuantity) AS TotalQuantity
 FROM FactInternetSales
 GROUP BY CustomerKey
-ORDER BY TOTALQUANTITY DESC
+ORDER BY TotalQuantity DESC;
 
- 
+--------------------------------------------------------------------------------
 
-/* Ex2: Dựa vào bảng FactInternetSales và DimProduct, thống kê tổng số lượng sản phẩm được bán (TotalOrderQuantity) 
-cho mỗi sản phẩm (EnglishProductName). Hiển thị kết quả theo thứ tự giảm dần của TotalOrderQuantity.  
-*/ 
+/* Exercise 2:
+Using the FactInternetSales and DimProduct tables,  
+calculate the total number of products sold (TotalOrderQuantity) for each product (EnglishProductName).  
+Display the results in descending order of TotalOrderQuantity.
+*/
+
 SELECT
     EnglishProductName,
-    SUM(OrderQuantity)AS TotalOrderQuantity
+    SUM(OrderQuantity) AS TotalOrderQuantity
 FROM FactInternetSales AS FIS
 JOIN DimProduct AS DP
-ON FIS.ProductKey=DP.ProductKey
+    ON FIS.ProductKey = DP.ProductKey
 GROUP BY EnglishProductName
-ORDER BY TotalOrderQuantity DESC
+ORDER BY TotalOrderQuantity DESC;
 
-/* Ex3: Dựa vào bảng FactInternetSales, DimCustomer. Tạo ra trường FullName 
-từ (FirstName, MiddleName, LastName và sử dụng dấu cách ' ' để ghép nối)   
-và thống kê số lượng đơn đặt hàng (OrderCount) mà họ đã thực hiện trong năm 2014. Và chỉ lấy những khách hàng có ít nhất 2 đơn đặt hàng.  */ 
+--------------------------------------------------------------------------------
+
+/* Exercise 3:
+From the FactInternetSales and DimCustomer tables,  
+create a FullName column by concatenating FirstName, MiddleName, and LastName with spaces.  
+Count the number of orders (OrderCount) each customer made in 2014,  
+and only display customers with at least 2 orders.
+*/
+
 SELECT
-    YEAR(OrderDate) AS YEAR,
+    YEAR(OrderDate) AS Year,
     COUNT(*) AS OrderCount,
-    CONCAT_WS(' ',FirstName,MiddleName,LastName) AS FullName
+    CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName
 FROM FactInternetSales AS FIS
 JOIN DimCustomer AS DC
-ON FIS.CustomerKey=DC.CustomerKey
-WHERE
-    YEAR(OrderDate) = 2014
-GROUP BY 
-    FirstName,MiddleName,LastName,OrderDate
-HAVING
-    COUNT(*) >=2
-ORDER BY OrderCount ASC
+    ON FIS.CustomerKey = DC.CustomerKey
+WHERE YEAR(OrderDate) = 2014
+GROUP BY FirstName, MiddleName, LastName, OrderDate
+HAVING COUNT(*) >= 2
+ORDER BY OrderCount ASC;
 
-/*  Ex4: Từ bảng DimProduct, DimProductSubCategory, DimProductCategory và FactInternetSales. 
-Viết truy vấn lấy ra EnglishProductCategoryName, TotalAmount (tính theo SaleAmount) của 2 danh mục có doanh thu cao nhất trong năm 2014 */ 
+--------------------------------------------------------------------------------
+
+/* Exercise 4:
+Using the DimProduct, DimProductSubcategory, DimProductCategory, and FactInternetSales tables,  
+retrieve EnglishProductCategoryName and the total sales amount (TotalAmount)  
+for the top 2 product categories with the highest revenue in the year 2014.
+*/
+
 SELECT TOP 2
     DPC.EnglishProductCategoryName,
-    SUM(FIS.SalesAmount)AS TotalAmount
+    SUM(FIS.SalesAmount) AS TotalAmount
 FROM FactInternetSales AS FIS
 JOIN DimProduct AS DP
-ON FIS.ProductKey= DP.ProductKey
+    ON FIS.ProductKey = DP.ProductKey
 JOIN DimProductSubcategory AS DPS
-ON DP.ProductSubcategoryKey= DPS.ProductSubcategoryKey
+    ON DP.ProductSubcategoryKey = DPS.ProductSubcategoryKey
 JOIN DimProductCategory AS DPC
-ON DPS.ProductCategoryKey=DPC.ProductCategoryKey
-WHERE YEAR (OrderDate)=2014
-GROUP BY EnglishProductCategoryName
-ORDER BY SUM(FIS.SalesAmount) DESC
+    ON DPS.ProductCategoryKey = DPC.ProductCategoryKey
+WHERE YEAR(OrderDate) = 2014
+GROUP BY DPC.EnglishProductCategoryName
+ORDER BY SUM(FIS.SalesAmount) DESC;
 
+--------------------------------------------------------------------------------
 
-/* Ex5: Từ bảng FactInternetSale và bảng FactResellerSale, 
-thực hiện từ 2 nguồn bán là Internet và Reseller đưa ra tất cả tất cả các SaleOrderNumber và doanh thu của mỗi SaleOrderNumber */ 
+/* Exercise 5:
+From the FactInternetSales and FactResellerSales tables,  
+retrieve all SalesOrderNumbers and corresponding revenue (SalesAmount)  
+from both Internet and Reseller sales sources.
+*/
+
 SELECT
     SalesOrderNumber,
     SalesAmount
@@ -68,16 +88,23 @@ SELECT
     SalesOrderNumber,
     SalesAmount
 FROM FactResellerSales
-ORDER BY SalesAmount DESC 
-/* Ex6: Dựa vào 2 bảng DimDepartmentGroup và bảng FactFinace, 
-thực hiện lấy ra TotalAmount (dựa vào Amount) của DepartmentGroupName và ParentDepartmentGroupName */ 
+ORDER BY SalesAmount DESC;
+
+--------------------------------------------------------------------------------
+
+/* Exercise 6:
+Using the DimDepartmentGroup and FactFinance tables,  
+retrieve the total amount (TotalAmount) based on Amount,  
+grouped by DepartmentGroupName and ParentDepartmentGroupName.
+*/
+
 SELECT
     DPG.DepartmentGroupName,
     PDPG.DepartmentGroupName AS ParentDepartmentGroupName,
-    SUM( Amount) AS TotalAmount
+    SUM(Amount) AS TotalAmount
 FROM FactFinance AS FF
 LEFT JOIN DimDepartmentGroup AS DPG
-ON FF.DepartmentGroupKey=DPG.DepartmentGroupKey
+    ON FF.DepartmentGroupKey = DPG.DepartmentGroupKey
 LEFT JOIN DimDepartmentGroup AS PDPG
-ON DPG.ParentDepartmentGroupKey=PDPG.DepartmentGroupKey
-GROUP BY DPG.DepartmentGroupName,PDPG.DepartmentGroupName
+    ON DPG.ParentDepartmentGroupKey = PDPG.DepartmentGroupKey
+GROUP BY DPG.DepartmentGroupName, PDPG.DepartmentGroupName;
