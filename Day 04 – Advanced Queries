@@ -1,21 +1,26 @@
-/*Ex 1: Từ các bảng dbo.DimProduct, dbo.DimPromotion, dbo.FactInternetSales, lấy ra ProductKey, EnglishProductName của các dòng thoả mãn Discount Pct >= 20%  
-*/ 
--- Your code here 
+/* Exercise 1:  
+From the tables dbo.DimProduct, dbo.DimPromotion, and dbo.FactInternetSales,  
+retrieve ProductKey and EnglishProductName for records where DiscountPct is greater than or equal to 20%.
+*/
+
 SELECT 
     DP.ProductKey, 
     DP.EnglishProductName 
 FROM FactInternetSales AS FIS 
 JOIN DimProduct AS DP 
-ON FIS.ProductKey = DP.ProductKey 
+    ON FIS.ProductKey = DP.ProductKey 
 JOIN DimPromotion AS DPR 
-ON FIS.PromotionKey = DPR.PromotionKey 
-WHERE DiscountPct >= 0.2 
+    ON FIS.PromotionKey = DPR.PromotionKey 
+WHERE DiscountPct >= 0.2;
 
-/*Ex 2: Từ các bảng DimProduct, DimProductSubcategory, DimProductCategory, 
-lấy ra các cột Product key, EnglishProductName, EnglishProductSubCategoryName, EnglishProductCategoryName 
-của sản phẩm thoả mãn điều kiện EnglishProductCategoryName là 'Clothing'  
-*/ 
- -- Your code here 
+--------------------------------------------------------------------------------
+
+/* Exercise 2:  
+From the tables DimProduct, DimProductSubcategory, and DimProductCategory,  
+retrieve ProductKey, EnglishProductName, EnglishProductSubCategoryName, and EnglishProductCategoryName  
+for products where EnglishProductCategoryName is 'Clothing'.
+*/
+
 SELECT
     DP.ProductKey, 
     DP.EnglishProductName, 
@@ -23,39 +28,52 @@ SELECT
     DPC.EnglishProductCategoryName 
 FROM DimProduct AS DP 
 JOIN DimProductSubcategory AS DPS 
-ON DP.ProductSubcategoryKey = DPS.ProductSubcategoryKey 
+    ON DP.ProductSubcategoryKey = DPS.ProductSubcategoryKey 
 JOIN DimProductCategory AS DPC 
-ON DPS.ProductCategoryKey = DPC.ProductCategoryKey 
-WHERE EnglishProductCategoryName = 'Clothing' 
+    ON DPS.ProductCategoryKey = DPC.ProductCategoryKey 
+WHERE EnglishProductCategoryName = 'Clothing';
 
+--------------------------------------------------------------------------------
 
-/*Ex 3: Từ bảng FactInternetSales và DimProduct, lấy ra ProductKey, EnglishProductName, ListPrice của những sản phẩm chưa từng được bán.  
+/* Exercise 3:  
+From the FactInternetSales and DimProduct tables,  
+retrieve ProductKey, EnglishProductName, and ListPrice  
+for products that have never been sold.  
 
-Sử dụng 2 cách: toán tử IN và phép JOIN  
+Use two approaches:  
+1. The NOT IN operator  
+2. LEFT JOIN with IS NULL  
+*/
 
-*/  -- Your code here 
+-- Method 1: Using NOT IN
 SELECT
     ProductKey,
     EnglishProductName,
     ListPrice
 FROM DimProduct
-WHERE ProductKey 
-NOT IN 
-(SELECT ProductKey
-FROM FactInternetSales)
+WHERE ProductKey NOT IN (
+    SELECT ProductKey
+    FROM FactInternetSales
+);
+
+-- Method 2: Using LEFT JOIN and IS NULL
 SELECT
     DP.ProductKey,
     DP.EnglishProductName,
     DP.ListPrice
 FROM DimProduct AS DP
 LEFT JOIN FactInternetSales AS FIS
-ON DP.ProductKey = FIS.ProductKey
-WHERE FIS.ProductKey IS NULL
+    ON DP.ProductKey = FIS.ProductKey
+WHERE FIS.ProductKey IS NULL;
 
-/*Ex 4: Từ bảng DimDepartmentGroup, lấy ra thông tin DepartmentGroupKey,
- DepartmentGroupName, ParentDepartmentGroupKey và thực hiện self-join lấy ra ParentDepartmentGroupName  
+--------------------------------------------------------------------------------
+
+/* Exercise 4:  
+From the DimDepartmentGroup table,  
+retrieve DepartmentGroupKey, DepartmentGroupName, and ParentDepartmentGroupKey.  
+Perform a self-join to also retrieve ParentDepartmentGroupName.
 */
- -- Your code here 
+
 SELECT
     CHILD.DepartmentGroupKey,
     CHILD.ParentDepartmentGroupKey,
@@ -63,25 +81,27 @@ SELECT
     PARENT.DepartmentGroupName AS ParentDepartmentGroupName
 FROM DimDepartmentGroup AS CHILD
 LEFT JOIN DimDepartmentGroup AS PARENT
-ON CHILD.ParentDepartmentGroupKey = PARENT.DepartmentGroupKey
+    ON CHILD.ParentDepartmentGroupKey = PARENT.DepartmentGroupKey;
 
- 
-/*Ex 5: Từ bảng FactFinance, DimOrganization, DimScenario, lấy ra OrganizationKey,
- OrganizationName, Parent OrganizationKey, và thực hiện self-join lấy ra Parent OrganizationName,
- Amount thoả mãn điều kiện ScenarioName là 'Actual'.  
-*/ 
--- Your code here 
+--------------------------------------------------------------------------------
+
+/* Exercise 5:  
+From the FactFinance, DimOrganization, and DimScenario tables,  
+retrieve OrganizationKey, OrganizationName, ParentOrganizationKey, Parent OrganizationName, and Amount  
+for records where ScenarioName is 'Actual'.
+*/
+
 SELECT
     DO.OrganizationKey,
     DO.OrganizationName,
     DO.ParentOrganizationKey,
-    PDO.OrganizationName AS 'Parent OrganizationName',
+    PDO.OrganizationName AS ParentOrganizationName,
     FF.Amount
 FROM FactFinance AS FF
 LEFT JOIN DimScenario AS DS
-ON FF.ScenarioKey = DS.ScenarioKey
+    ON FF.ScenarioKey = DS.ScenarioKey
 LEFT JOIN DimOrganization AS DO
-ON FF.OrganizationKey = DO.OrganizationKey
+    ON FF.OrganizationKey = DO.OrganizationKey
 LEFT JOIN DimOrganization AS PDO
-ON DO.ParentOrganizationKey = PDO.OrganizationKey
-WHERE DS.ScenarioName = 'Actual'
+    ON DO.ParentOrganizationKey = PDO.OrganizationKey
+WHERE DS.ScenarioName = 'Actual';
