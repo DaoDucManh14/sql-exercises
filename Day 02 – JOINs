@@ -1,0 +1,102 @@
+/* Exercise 1:
+From the AdventureWorksDW2019 database, table FactInternetSales,  
+retrieve all records where OrderDate is on or after '2011-01-01'  
+and ShipDate falls within the year 2011.
+*/
+
+SELECT * 
+FROM FactInternetSales 
+WHERE OrderDate >= '2011-01-01' 
+  AND YEAR(ShipDate) = 2011;
+
+--------------------------------------------------------------------------------
+
+/* Exercise 2:
+From the AdventureWorksDW2019 database, table DimProduct,  
+retrieve ProductKey, ProductAlternateKey, and EnglishProductName  
+for products where:  
+- ProductAlternateKey starts with 'BK-',  
+- Followed by any character **except 'T'**,  
+- And ends with **any two digits**.  
+Also, the product's Color must be either Black, Red, or White.
+*/
+
+SELECT 
+    ProductKey,  
+    ProductAlternateKey,  
+    EnglishProductName 
+FROM DimProduct 
+WHERE ProductAlternateKey LIKE 'BK-[^T]__[0-9][0-9]'  -- Note: SQL Server may not support this LIKE pattern directly
+  AND Color IN ('Black', 'Red', 'White');
+
+--------------------------------------------------------------------------------
+
+/* Exercise 3:
+From the AdventureWorksDW2019 database, table DimProduct,  
+retrieve all products where the Color is 'Red'.
+*/
+
+SELECT *  
+FROM DimProduct 
+WHERE Color = 'Red';
+
+--------------------------------------------------------------------------------
+
+/* Exercise 4:
+From the AdventureWorksDW2019 database, table FactInternetSales,  
+retrieve all records for products that have Color = 'Red'.  
+Hint: Use IN with a subquery.
+*/
+
+SELECT * 
+FROM FactInternetSales 
+WHERE ProductKey IN ( 
+    SELECT ProductKey 
+    FROM DimProduct 
+    WHERE Color = 'Red' 
+);
+
+--------------------------------------------------------------------------------
+
+/* Exercise 5:
+From the AdventureWorksDW2019 database, table DimEmployee,  
+retrieve EmployeeKey, FirstName, LastName, and MiddleName  
+for employees whose MiddleName is NOT NULL  
+and the Phone number has a length of exactly 12 characters.
+*/
+
+SELECT 
+    EmployeeKey, 
+    FirstName, 
+    LastName, 
+    MiddleName 
+FROM DimEmployee 
+WHERE MiddleName IS NOT NULL  
+  AND LEN(Phone) = 12;
+
+--------------------------------------------------------------------------------
+
+/* Exercise 6:
+From the AdventureWorksDW2019 database, table DimEmployee,  
+retrieve the following:  
+a. FullName → FirstName + MiddleName + LastName (use both '+' operator and function approach)  
+b. AgeNow → Calculated using BirthDate and current date  
+c. UserName → Extract the part after '\' from LoginID (e.g., 'adventure-works\jun0' → 'jun0')  
+*/
+
+SELECT 
+    EmployeeKey, 
+
+    -- FullName using '+' operator
+    FirstName + ' ' + MiddleName + ' ' + LastName AS FullName_Concat,  
+
+    -- FullName using ISNULL function for optional MiddleName
+    FirstName + ' ' + ISNULL(MiddleName + ' ', '') + LastName AS FullName_Function, 
+
+    -- Age at current time
+    DATEDIFF(YEAR, BirthDate, GETDATE()) AS AgeNow, 
+
+    -- Extract username from LoginID
+    RIGHT(LoginID, CHARINDEX('\\', REVERSE(LoginID)) - 1) AS UserName 
+
+FROM DimEmployee;
