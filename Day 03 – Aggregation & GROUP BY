@@ -1,229 +1,131 @@
-/*Ex 1: Từ bảng dbo.FactInternetSales và dbo.DimSalesTerritory, lấy ra thông tin SalesOrderNumber, SalesOrderLineNumber, ProductKey, SalesTerritoryCountry  của các bản ghi có SalesAmount trên 1000 
-
-*/ 
-
--- Your code here 
-
- 
-
-SELECT FIS.SalesOrderNumber, 
-
-    FIS.SalesOrderLineNumber, 
-
-    FIS.ProductKey, 
-
-    DST.SalesTerritoryCountry 
-
-FROM dbo.FactInternetSales AS FIS 
-
-JOIN dbo.DimSalesTerritory AS DST 
-
-ON FIS.SalesTerritoryKey = DST.SalesTerritoryKey 
-
-WHERE FIS.SalesAmount > 1000 
-
- 
-
- 
-
- 
-
- 
-
- 
-
-/*Ex 2: Từ bảng dbo.DimProduct và dbo.DimProductSubcategory. Lấy ra ProductKey, EnglishProductName và Color của các sản phẩm thoả mãn EnglishProductSubCategoryName chứa chữ 'Bikes' và ListPrice có phần nguyên là 3399 
-
-*/ 
-
--- Your code here 
-
+/* Exercise 1:
+From the tables dbo.FactInternetSales and dbo.DimSalesTerritory,  
+retrieve SalesOrderNumber, SalesOrderLineNumber, ProductKey, and SalesTerritoryCountry  
+for records where SalesAmount is greater than 1000.
+*/
 
 SELECT 
-
-    DP.ProductKey, 
-
-    DP.EnglishProductName, 
-
-    DP.Color, 
-
-    DP.Listprice 
-
-FROM dbo.DimProduct AS DP 
-
-JOIN dbo.DimProductSubcategory AS DPS 
-
-ON DP.ProductSubcategoryKey = DPS.ProductSubcategoryKey 
-
-WHERE DPS.EnglishProductSubcategoryName LIKE '%Bikes%' 
-
-AND DP.ListPrice LIKE '3399%' 
-
- 
-
- 
-
- 
-
- 
-
-/* Ex 3: Từ bảng dbo.DimPromotion, dbo.FactInternetSales, lấy ra ProductKey, SalesOrderNumber, SalesAmount từ các bản ghi thoả mãn DiscountPct >= 20%  
-
-*/ 
-
--- Your code here 
-
- 
-
- 
- 
-
-SELECT FIS.ProductKey, 
-
     FIS.SalesOrderNumber, 
+    FIS.SalesOrderLineNumber, 
+    FIS.ProductKey, 
+    DST.SalesTerritoryCountry 
+FROM dbo.FactInternetSales AS FIS 
+JOIN dbo.DimSalesTerritory AS DST 
+    ON FIS.SalesTerritoryKey = DST.SalesTerritoryKey 
+WHERE FIS.SalesAmount > 1000;
 
-    FIS.SalesAmount 
+--------------------------------------------------------------------------------
 
-FROM DBO.DimPromotion AS DP 
-
-JOIN DBO.FactInternetSales AS FIS 
-
-ON DP.PromotionKey = FIS.PromotionKey 
-
-WHERE DiscountPct >= 0.2 
-
- 
-
- 
-
- 
-
- 
-
-/* Ex 4: Từ bảng dbo.DimCustomer, dbo.DimGeography, lấy ra cột Phone, FullName (kết hợp FirstName, MiddleName, LastName kèm khoảng cách ở giữa) và City của các khách hàng có YearlyInCome > 150000 và CommuteDistance nhỏ hơn 5 Miles 
-
-*/ 
-
- -- Your code here 
-
- SELECT DC.Phone, 
-
-    CONCAT_WS(' ',FirstName,MiddleName,LastName) AS FullName, 
-
-    CommuteDistance 
-
-FROM dbo.DimCustomer AS DC 
-
-JOIN dbo.DimGeography AS DG 
-
-ON DC.GeographyKey = DG.GeographyKey 
-
-WHERE YearlyIncome > 150000 
-
-AND DC.CommuteDistance IN ('0-1 Miles', '1-2 Miles', '2-5 Miles') 
-
- 
-
- 
-
- 
-
- 
-
--- LogicalExpression   
-
-/* Ex 5: Từ bảng dbo.DimCustomer, lấy ra CustomerKey và thực hiện các yêu cầu sau:  
-
-a. Tạo cột mới đặt tên là YearlyInComeRange từ các điều kiện sau:  
-
-- Nếu YearlyIncome từ 0 đến 50000 thì gán giá trị "Low Income"  
-
-- Nếu YearlyIncome từ 50001 đến 90000 thì gán giá trị "Middle Income"  
-
-- Nếu YearlyIncome từ  90001 trở lên thì gán giá trị "High Income"  
-
-b. Tạo cột mới đặt tên là AgeRange từ các điều kiện sau:  
-
-- Nếu tuổi của Khách hàng tính đến 31/12/2019 đến 39 tuổi thì gán giá trị "Young Adults"  
-
-- Nếu tuổi của Khách hàng tính đến 31/12/2019 từ 40 đến 59 tuổi thì gán giá trị "Middle-Aged Adults"  
-
-- Nếu tuổi của Khách hàng tính đến 31/12/2019 lớn hơn 60 tuổi thì gán giá trị "Old Adults"  
-
- */   
-
--- Your code here 
+/* Exercise 2:
+From the tables dbo.DimProduct and dbo.DimProductSubcategory,  
+retrieve ProductKey, EnglishProductName, and Color for products where:  
+- EnglishProductSubcategoryName contains the word 'Bikes'  
+- The integer part of ListPrice starts with 3399
+*/
 
 SELECT 
+    DP.ProductKey, 
+    DP.EnglishProductName, 
+    DP.Color, 
+    DP.ListPrice 
+FROM dbo.DimProduct AS DP 
+JOIN dbo.DimProductSubcategory AS DPS 
+    ON DP.ProductSubcategoryKey = DPS.ProductSubcategoryKey 
+WHERE DPS.EnglishProductSubcategoryName LIKE '%Bikes%' 
+  AND FLOOR(DP.ListPrice) = 3399;
 
+--------------------------------------------------------------------------------
+
+/* Exercise 3:
+From the tables dbo.DimPromotion and dbo.FactInternetSales,  
+retrieve ProductKey, SalesOrderNumber, and SalesAmount  
+for records where DiscountPct is greater than or equal to 20%.
+*/
+
+SELECT 
+    FIS.ProductKey, 
+    FIS.SalesOrderNumber, 
+    FIS.SalesAmount 
+FROM dbo.DimPromotion AS DP 
+JOIN dbo.FactInternetSales AS FIS 
+    ON DP.PromotionKey = FIS.PromotionKey 
+WHERE DP.DiscountPct >= 0.2;
+
+--------------------------------------------------------------------------------
+
+/* Exercise 4:
+From the tables dbo.DimCustomer and dbo.DimGeography,  
+retrieve Phone, FullName (concatenation of FirstName, MiddleName, LastName), and CommuteDistance  
+for customers with YearlyIncome > 150000 and CommuteDistance under 5 Miles.
+*/
+
+SELECT 
+    DC.Phone, 
+    CONCAT_WS(' ', FirstName, MiddleName, LastName) AS FullName, 
+    CommuteDistance 
+FROM dbo.DimCustomer AS DC 
+JOIN dbo.DimGeography AS DG 
+    ON DC.GeographyKey = DG.GeographyKey 
+WHERE DC.YearlyIncome > 150000 
+  AND DC.CommuteDistance IN ('0-1 Miles', '1-2 Miles', '2-5 Miles');
+
+--------------------------------------------------------------------------------
+
+/* Exercise 5:
+From the dbo.DimCustomer table, retrieve CustomerKey and create the following columns:
+
+a. YearlyIncomeRange:
+- 0–50,000 → 'Low Income'
+- 50,001–90,000 → 'Middle Income'
+- ≥90,001 → 'High Income'
+
+b. AgeRange (as of 31/12/2019):
+- ≤ 39 → 'Young Adults'
+- 40–59 → 'Middle-Aged Adults'
+- ≥ 60 → 'Old Adults'
+*/
+
+SELECT 
     CustomerKey, 
 
-CASE 
+    CASE 
+        WHEN YearlyIncome BETWEEN 0 AND 50000 THEN 'Low Income' 
+        WHEN YearlyIncome BETWEEN 50001 AND 90000 THEN 'Middle Income' 
+        WHEN YearlyIncome >= 90001 THEN 'High Income' 
+        ELSE 'Unknown' 
+    END AS YearlyIncomeRange, 
 
-    WHEN YearlyIncome BETWEEN 0 AND 50000 THEN 'Low Income' 
+    CASE 
+        WHEN DATEDIFF(YEAR, BirthDate, '2019-12-31') <= 39 THEN 'Young Adults' 
+        WHEN DATEDIFF(YEAR, BirthDate, '2019-12-31') BETWEEN 40 AND 59 THEN 'Middle-Aged Adults' 
+        WHEN DATEDIFF(YEAR, BirthDate, '2019-12-31') >= 60 THEN 'Old Adults' 
+        ELSE 'Unknown' 
+    END AS AgeRange 
 
-    WHEN YearlyIncome BETWEEN 50001 AND 90000 THEN 'Middle Income' 
+FROM dbo.DimCustomer;
 
-    WHEN YearlyIncome >= 90001 THEN 'High Income' 
+--------------------------------------------------------------------------------
 
-    ELSE 'Unknown' 
-
-END AS YearlyInComeRange, 
-
-CASE 
-
-    WHEN DATEDIFF(YEAR,BirthDate,'2019-12-31') <= 39 THEN 'Young Adults' 
-
-    WHEN DATEDIFF(YEAR,BirthDate,'2019-12-31') BETWEEN 40 AND 59 THEN 'Middle-Age Adults' 
-
-    WHEN DATEDIFF(YEAR,BirthDate,'2019-12-31') >= 60 THEN 'Old Adults' 
-
-    ELSE 'Unknown' 
-
-END AS AgeRange 
-
-FROM DimCustomer 
-
- 
-
- 
-
- 
-
--- UNION concept 
-
-/* Ex 6: Từ bảng FactInternetSales, FactResellerSales và DimProduct. Tìm tất cả SalesOrderNumber có EnglishProductName chứa từ 'Road' và có màu vàng (Yellow) */ 
-
--- Your code here 
-
- 
+/* Exercise 6:
+Using the tables FactInternetSales, FactResellerSales, and DimProduct,  
+find all SalesOrderNumbers for products that:  
+- Have EnglishProductName containing 'Road'  
+- Have Color = 'Yellow'  
+Use UNION to combine results from both sales channels.
+*/
 
 SELECT SalesOrderNumber 
-
 FROM FactInternetSales AS FIS 
-
 JOIN DimProduct AS DP 
-
-ON FIS.ProductKey = DP.ProductKey 
-
+    ON FIS.ProductKey = DP.ProductKey 
 WHERE DP.EnglishProductName LIKE '%Road%' 
-
-AND DP.Color = 'Yellow' 
+  AND DP.Color = 'Yellow' 
 
 UNION 
 
 SELECT SalesOrderNumber  
-
 FROM FactResellerSales AS FRS 
-
 JOIN DimProduct AS DP 
-
-ON FRS.ProductKey = DP.ProductKey 
-
+    ON FRS.ProductKey = DP.ProductKey 
 WHERE DP.EnglishProductName LIKE '%Road%' 
-
-AND DP.Color = 'Yellow' 
-
- 
-
- 
+  AND DP.Color = 'Yellow';
